@@ -1,0 +1,61 @@
+[ 게시판 테이블 ]
+
+공지사항 테이블
+
+CREATE TABLE g (
+    g_id     NUMBER PRIMARY KEY,             -- 공지사항 ID
+    title         VARCHAR2(255) NOT NULL,         -- 제목
+    content       CLOB NOT NULL,                  -- 내용 (긴 텍스트 처리)
+    sdate    DATE DEFAULT SYSDATE,           -- 작성일 (기본값: 현재 시간)
+    edate    DATE,                        			   -- 수정일
+    status        VARCHAR2(50) DEFAULT '공개',    -- 상태 (예: 공개, 비공개, 삭제 등)
+    author        VARCHAR2(100)                   -- 작성자
+);
+
+공지사항 시퀀스
+
+-- 공지사항 ID를 자동으로 증가시키는 시퀀스
+CREATE SEQUENCE notice_seq
+START WITH 1               -- 첫 번째 값은 1
+INCREMENT BY 1            -- 증가값 1씩 증가
+NOCACHE                   -- 시퀀스 값 캐시 사용 안 함
+NOCYCLE                   -- 값이 반복되지 않도록 설정
+;
+
+INSERT INTO notices (notice_id, title, content, created_at, status, author)
+VALUES (notice_seq.NEXTVAL, '공지사항 제목', '공지사항 내용입니다.', SYSDATE, '공개', '작성자명');
+
+자주 묻는 질문 테이블
+
+CREATE TABLE q (
+    q_id        NUMBER PRIMARY KEY,             -- 질문 ID
+    question      CLOB NOT NULL,                   -- 질문 내용
+    answer        CLOB NOT NULL,                   -- 답변 내용
+    sdate    DATE DEFAULT SYSDATE,           -- 등록일 (기본값: 현재 시간)
+    edate    DATE,                        			   -- 수정일
+    category      VARCHAR2(100),                   -- 카테고리 (예: 배송, 환불 등)
+    status        VARCHAR2(50) DEFAULT '활성'      -- 상태 (예: 활성, 비활성)
+);
+
+시퀀스
+
+-- FAQ 삽입 시, faq_id는 시퀀스를 사용하여 수동으로 삽입
+INSERT INTO faqs (faq_id, question, answer, created_at, category, status)
+VALUES (faq_seq.NEXTVAL, '자주 묻는 질문 예시?', '자주 묻는 질문에 대한 답변입니다.', SYSDATE, '배송', '활성');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

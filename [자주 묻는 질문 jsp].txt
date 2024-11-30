@@ -1,0 +1,55 @@
+[자주 묻는 질문 jsp]
+
+faq.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.sql.*, javax.naming.*, javax.sql.*" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>자주 묻는 질문</title>
+</head>
+<body>
+    <h2>자주 묻는 질문</h2>
+    
+    <%
+        // 데이터베이스 연결 설정
+        DataSource ds = (DataSource) new InitialContext().lookup("jdbc/mydb");
+        Connection conn = ds.getConnection();
+        
+        String query = "SELECT faq_id, question, created_at FROM faqs WHERE status = '활성' ORDER BY created_at DESC";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+    %>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>질문</th>
+                <th>등록일</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% while(rs.next()) { %>
+                <tr>
+                    <td><%= rs.getInt("faq_id") %></td>
+                    <td><a href="faqDetail.jsp?faq_id=<%= rs.getInt("faq_id") %>"><%= rs.getString("question") %></a></td>
+                    <td><%= rs.getDate("created_at") %></td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <%
+        // 리소스 닫기
+        rs.close();
+        stmt.close();
+        conn.close();
+    %>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+[자주 묻는 질문 상세페이지 jsp]
+
+faqDetail.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, javax.naming.*, javax.sql.*" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>자주 묻는 질문 상세</title>
+</head>
+<body>
+    <h2>자주 묻는 질문 상세</h2>
+
+    <%
+        // 데이터베이스 연결 설정
+        DataSource ds = (DataSource) new InitialContext().lookup("jdbc/mydb");
+        Connection conn = ds.getConnection();
+        
+        String faqId = request.getParameter("faq_id");
+        String query = "SELECT * FROM faqs WHERE faq_id = ?";
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, Integer.parseInt(faqId));
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next()) {
+    %>
+
+    <h3><%= rs.getString("question") %></h3>
+    <p><%= rs.getString("answer") %></p>
+    <p>카테고리: <%= rs.getString("category") %></p>
+    <p>등록일: <%= rs.getDate("created_at") %></p>
+
+    <%
+        } else {
+    %>
+    <p>해당 FAQ를 찾을 수 없습니다.</p>
+    <%
+        }
+        // 리소스 닫기
+        rs.close();
+        stmt.close();
+        conn.close();
+    %>
+
+    <a href="faq.jsp">목록으로 돌아가기</a>
+</body>
+</html>

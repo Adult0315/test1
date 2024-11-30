@@ -1,0 +1,62 @@
+[ 공지사항 JSP ]
+
+notice.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.sql.*, javax.naming.*, javax.sql.*" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항</title>
+</head>
+<body>
+    <h2>공지사항</h2>
+    
+    <%
+        // 데이터베이스 연결 설정
+        DataSource ds = (DataSource) new InitialContext().lookup("jdbc/mydb");
+        Connection conn = ds.getConnection();
+        
+        String query = "SELECT notice_id, title, created_at, status FROM notices ORDER BY created_at DESC";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+    %>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>작성일</th>
+                <th>상태</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% while(rs.next()) { %>
+                <tr>
+                    <td><%= rs.getInt("notice_id") %></td>
+                    <td><a href="noticeDetail.jsp?notice_id=<%= rs.getInt("notice_id") %>"><%= rs.getString("title") %></a></td>
+                    <td><%= rs.getDate("created_at") %></td>
+                    <td><%= rs.getString("status") %></td>
+                    <td>
+                        <a href="noticeDeleteAction.jsp?notice_id=<%= rs.getInt("notice_id") %>" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <%
+        // 리소스 닫기
+        rs.close();
+        stmt.close();
+        conn.close();
+    %>
+
+</body>
+</html>
+

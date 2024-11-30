@@ -1,0 +1,49 @@
+[공지사항 삭제 jsp]
+
+noticeDeleteAction.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, javax.naming.*, javax.sql.*" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 삭제</title>
+</head>
+<body>
+    <h2>공지사항 삭제 결과</h2>
+    <%
+        // 공지사항 ID를 파라미터로 받아옴
+        String noticeId = request.getParameter("notice_id");
+
+        // 데이터베이스 연결 설정
+        DataSource ds = (DataSource) new InitialContext().lookup("jdbc/mydb");
+        Connection conn = ds.getConnection();
+
+        // 공지사항 삭제 SQL
+        String query = "DELETE FROM notices WHERE notice_id = ?";
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, Integer.parseInt(noticeId));
+
+        // 삭제 실행
+        int result = stmt.executeUpdate();
+
+        if (result > 0) {
+    %>
+            <p>공지사항이 성공적으로 삭제되었습니다.</p>
+    <%
+        } else {
+    %>
+            <p>공지사항 삭제에 실패했습니다. 다시 시도해주세요.</p>
+    <%
+        }
+
+        // 리소스 닫기
+        stmt.close();
+        conn.close();
+    %>
+
+    <a href="notice.jsp">목록으로 돌아가기</a>
+</body>
+</html>
