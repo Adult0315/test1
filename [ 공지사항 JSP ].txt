@@ -1,62 +1,52 @@
 [ 공지사항 JSP ]
 
-notice.jsp
+<%@ include file="../include/oracleCon.jsp" %>
+<%
+// 공지사항 데이터 로드
+String sql1 = "SELECT COUNT(*) FROM NOTICEBOARD";
+ResultSet rs1 = stmt.executeQuery(sql1);
+rs1.next();
+int total = rs1.getInt(1);
 
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.sql.*, javax.naming.*, javax.sql.*" %>
+int rownum = total - (unitDate * (Integer.parseInt(pageNo) - 1));
+int lastpage = (int) Math.ceil((double)total / unitDate);
+int sno = (Integer.parseInt(pageNo) - 1) * unitDate + 1;
+int eno = sno + (unitDate - 1);
 
+String sql2 = "SELECT B.* FROM (" +
+              " SELECT ROWNUM RN, A.* FROM (" +
+              "   SELECT UNQ, TITLE, NAME, HITS, TO_CHAR(RDATE, 'yyyy.mm.dd') RDATE" +
+              "   FROM NOTICEBOARD ORDER BY UNQ DESC" +
+              " ) A ) B WHERE RN BETWEEN " + sno + " AND " + eno;
+ResultSet rs2 = stmt.executeQuery(sql2);
+%>
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>공지사항</title>
 </head>
 <body>
-    <h2>공지사항</h2>
-    
-    <%
-        // 데이터베이스 연결 설정
-        DataSource ds = (DataSource) new InitialContext().lookup("jdbc/mydb");
-        Connection conn = ds.getConnection();
-        
-        String query = "SELECT notice_id, title, created_at, status FROM notices ORDER BY created_at DESC";
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
-    %>
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>제목</th>
-                <th>작성일</th>
-                <th>상태</th>
-                <th>삭제</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% while(rs.next()) { %>
-                <tr>
-                    <td><%= rs.getInt("notice_id") %></td>
-                    <td><a href="noticeDetail.jsp?notice_id=<%= rs.getInt("notice_id") %>"><%= rs.getString("title") %></a></td>
-                    <td><%= rs.getDate("created_at") %></td>
-                    <td><%= rs.getString("status") %></td>
-                    <td>
-                        <a href="noticeDeleteAction.jsp?notice_id=<%= rs.getInt("notice_id") %>" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
-                    </td>
-                </tr>
-            <% } %>
-        </tbody>
-    </table>
-
-    <%
-        // 리소스 닫기
-        rs.close();
-        stmt.close();
-        conn.close();
-    %>
-
+<h1>공지사항</h1>
+<table>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>날짜</th>
+        <th>조회수</th>
+    </tr>
+    <% while(rs2.next()) { %>
+    <tr>
+        <td><%= rownum-- %></td>
+        <td><a href="boardDetail.jsp?unq=<%= rs2.getString("UNQ") %>"><%= rs2.getString("TITLE") %></a></td>
+        <td><%= rs2.getString("NAME") %></td>
+        <td><%= rs2.getString("RDATE") %></td>
+        <td><%= rs2.getInt("HITS") %></td>
+    </tr>
+    <% } %>
+</table>
 </body>
 </html>
+
 
