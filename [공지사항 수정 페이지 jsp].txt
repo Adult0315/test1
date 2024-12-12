@@ -1,5 +1,7 @@
 [공지사항 수정 페이지 jsp]
 
+boardDetail.jsp
+
 <%@page import="java.sql.ResultSet"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
